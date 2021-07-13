@@ -1,4 +1,4 @@
-import { Engine, HemisphericLight, Mesh, MeshBuilder, UniversalCamera, Vector3 } from "@babylonjs/core";
+import { Axis, CannonJSPlugin, Engine, HemisphericLight, Mesh, MeshBuilder, PhysicsImpostor, Space, UniversalCamera, Vector3 } from "@babylonjs/core";
 import {Scene} from "@babylonjs/core/scene";
 import {hideLoadingScreen, showLoadingScreen} from "./loadingScreen";
 
@@ -6,6 +6,8 @@ class App {
     public _canvas: HTMLCanvasElement;
     public _engine: Engine;
     public _scene: Scene;
+
+    public sphere: Mesh;
 
 
     constructor(){
@@ -23,7 +25,18 @@ class App {
 
         showLoadingScreen(this._canvas, this._engine);
 
-        let sphere: Mesh = MeshBuilder.CreateSphere("sphere", {}, this._scene);
+        this.sphere = MeshBuilder.CreateSphere("sphere", {}, this._scene);
+        let spherePhysicsImposter = new PhysicsImpostor(
+            this.sphere,
+            PhysicsImpostor.BoxImpostor,
+            {
+                mass: 1,
+                friction: 0.1,
+                restitution: 0.85
+            },
+            this._scene
+        );
+        this.sphere.checkCollisions = true;
 
         let scene = this._scene;
         scene.afterRender = () => {hideLoadingScreen(this._engine)} ;
@@ -60,6 +73,13 @@ class App {
     public _createGameScene(): void{
         this._scene = new Scene(this._engine);
 
+        this._scene.gravity = new Vector3(0, -.4, 0);
+        let physicsPlugin = new CannonJSPlugin();
+        this._scene.enablePhysics(this._scene.gravity, physicsPlugin); 
+
+        // Enable collisions
+        this._scene.collisionsEnabled = true;
+
         let camera = new UniversalCamera("Camera", new Vector3(2,2,2), this._scene);
         camera.attachControl(this._canvas, true);
         camera.setTarget(Vector3.Zero());
@@ -74,6 +94,35 @@ class App {
         camera.speed = 1.5;
         camera.fov = 0.8;
         camera.inertia = 0;
+
+        camera.ellipsoid = new Vector3(1.5, 0.5, 1.5);
+        camera.checkCollisions = true;
+        camera.applyGravity = true;
+
+
+        //plane generation for world
+        let plane = MeshBuilder.CreatePlane("ground", {
+            height: 20,
+            width: 20
+        }, this._scene);
+
+
+        plane.rotate(Axis.X, Math.PI /2, Space.WORLD);
+        plane.position.y = -2;
+        let groundPhysicsImposter = new PhysicsImpostor(
+            plane,
+            PhysicsImpostor.BoxImpostor,
+            {
+                mass: 0,
+                friction: 0.1, 
+                restitution: .7
+            },
+            this._scene 
+          );
+        //plane.collisionsEnabled = true;
+        plane.checkCollisions = true;
+
+        //this._physicsEngine();
 
 
         let light = new HemisphericLight("gamelight", new Vector3(1,1,0), this._scene);
@@ -92,6 +141,7 @@ class App {
             };
         }, false);
     }
+
 }
 new App();
 
