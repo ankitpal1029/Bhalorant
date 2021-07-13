@@ -19,6 +19,7 @@ class App {
         // initialize babylon scene and engine
         this._engine = new Engine(this._canvas, true);
         this._createGameScene();
+        this._createPointerLock();
 
         showLoadingScreen(this._canvas, this._engine);
 
@@ -63,17 +64,33 @@ class App {
         camera.attachControl(this._canvas, true);
         camera.setTarget(Vector3.Zero());
 
+        // setting up key movements
         camera.keysUp.push(87);
         camera.keysDown.push(83);
         camera.keysLeft.push(65);
         camera.keysRight.push(68);
 
+        //camera properties
         camera.speed = 1.5;
         camera.fov = 0.8;
         camera.inertia = 0;
 
 
         let light = new HemisphericLight("gamelight", new Vector3(1,1,0), this._scene);
+    }
+
+    public _createPointerLock(): void {
+        let canvas = this._scene.getEngine().getRenderingCanvas();
+        canvas.addEventListener("click", event => {
+            canvas.requestPointerLock = canvas.requestPointerLock || 
+                canvas.msRequestPointerLock  ||
+                canvas.mozRequestPointerLock || 
+                canvas.webkitRequestPointerLock;
+
+            if(canvas.requestPointerLock){
+                canvas.requestPointerLock();
+            };
+        }, false);
     }
 }
 new App();
