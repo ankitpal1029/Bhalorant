@@ -1,13 +1,27 @@
-import { Axis, CannonJSPlugin, Engine, HemisphericLight, Mesh, MeshBuilder, PhysicsImpostor, Space, UniversalCamera, Vector3 } from "@babylonjs/core";
+import { Axis, 
+    CannonJSPlugin,
+    Engine, 
+    HemisphericLight, 
+    Mesh, 
+    MeshBuilder, 
+    PhysicsImpostor, 
+    Space, 
+    UniversalCamera, 
+    Vector3 } from "@babylonjs/core";
 import {Scene} from "@babylonjs/core/scene";
 import {hideLoadingScreen, showLoadingScreen} from "./loadingScreen";
+import {EnemyPlayer} from "./player/enemyPlayer";
 
 class App {
     public _canvas: HTMLCanvasElement;
     public _engine: Engine;
     public _scene: Scene;
 
-    public sphere: Mesh;
+
+    // Game variables
+    public _enemyList: EnemyPlayer[] = [];
+
+    //public sphere: Mesh;
 
 
     constructor(){
@@ -25,18 +39,9 @@ class App {
 
         showLoadingScreen(this._canvas, this._engine);
 
-        this.sphere = MeshBuilder.CreateSphere("sphere", {}, this._scene);
-        let spherePhysicsImposter = new PhysicsImpostor(
-            this.sphere,
-            PhysicsImpostor.BoxImpostor,
-            {
-                mass: 1,
-                friction: 0.1,
-                restitution: 0.85
-            },
-            this._scene
-        );
-        this.sphere.checkCollisions = true;
+        // generate Enemies
+        this._generateEnemies(1);
+
 
         let scene = this._scene;
         scene.afterRender = () => {hideLoadingScreen(this._engine)} ;
@@ -108,7 +113,7 @@ class App {
 
 
         plane.rotate(Axis.X, Math.PI /2, Space.WORLD);
-        plane.position.y = -2;
+        plane.position.y = -1;
         let groundPhysicsImposter = new PhysicsImpostor(
             plane,
             PhysicsImpostor.BoxImpostor,
@@ -140,6 +145,13 @@ class App {
                 canvas.requestPointerLock();
             };
         }, false);
+    }
+
+    public _generateEnemies(enemies: Number): void{
+        for(let i = 0; i < enemies; i++){
+            let enemy1 = new EnemyPlayer(this._scene, this._enemyList.length || 1);
+            this._enemyList.push(enemy1);
+        }
     }
 
 }
