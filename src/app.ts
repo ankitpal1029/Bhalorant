@@ -10,12 +10,14 @@ import { Axis,
     Vector3 } from "@babylonjs/core";
 import {Scene} from "@babylonjs/core/scene";
 import {hideLoadingScreen, showLoadingScreen} from "./loadingScreen";
+import {CurrentPlayer} from "./player/currentPlayer";
 import {EnemyPlayer} from "./player/enemyPlayer";
 
 class App {
     public _canvas: HTMLCanvasElement;
     public _engine: Engine;
     public _scene: Scene;
+    public _camera: UniversalCamera;
 
 
     // Game variables
@@ -85,24 +87,28 @@ class App {
         // Enable collisions
         this._scene.collisionsEnabled = true;
 
-        let camera = new UniversalCamera("Camera", new Vector3(2,2,2), this._scene);
-        camera.attachControl(this._canvas, true);
-        camera.setTarget(Vector3.Zero());
+        this._camera = new UniversalCamera("Camera", new Vector3(2,2,2), this._scene);
+        this._camera.attachControl(this._canvas, true);
+        this._camera.setTarget(Vector3.Zero());
 
         // setting up key movements
-        camera.keysUp.push(87);
-        camera.keysDown.push(83);
-        camera.keysLeft.push(65);
-        camera.keysRight.push(68);
+        this._camera.keysUp.push(87);
+        this._camera.keysDown.push(83);
+        this._camera.keysLeft.push(65);
+        this._camera.keysRight.push(68);
 
         //camera properties
-        camera.speed = 1.5;
-        camera.fov = 0.8;
-        camera.inertia = 0;
+        this._camera.speed = 1.5;
+        this._camera.fov = 0.8;
+        this._camera.inertia = 0;
 
-        camera.ellipsoid = new Vector3(1.5, 0.5, 1.5);
-        camera.checkCollisions = true;
-        camera.applyGravity = true;
+        this._camera.ellipsoid = new Vector3(1.5, 0.5, 1.5);
+        this._camera.checkCollisions = true;
+        this._camera.applyGravity = true;
+
+        // generate current players mesh
+        console.log(this._camera);
+        new CurrentPlayer(this._scene, this._camera);
 
 
         //plane generation for world
