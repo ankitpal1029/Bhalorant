@@ -8,20 +8,21 @@ import { Axis,
     Space, 
     UniversalCamera, 
     Vector3 } from "@babylonjs/core";
-import {Scene} from "@babylonjs/core/scene";
-import {hideLoadingScreen, showLoadingScreen} from "./loadingScreen";
-import {CurrentPlayer} from "./player/currentPlayer";
-import {EnemyPlayer} from "./player/enemyPlayer";
+import { Scene } from "@babylonjs/core/scene";
+import { hideLoadingScreen, showLoadingScreen } from "./loadingScreen";
+import { CurrentPlayer } from "./player/currentPlayer";
+import { EnemyPlayer } from "./player/enemyPlayer";
 
 class App {
     public _canvas: HTMLCanvasElement;
     public _engine: Engine;
     public _scene: Scene;
     public _camera: UniversalCamera;
-
+    public _light: HemisphericLight;
 
     // Game variables
     public _enemyList: EnemyPlayer[] = [];
+    //public _bulletList: 
 
     //public sphere: Mesh;
 
@@ -97,6 +98,7 @@ class App {
         this._camera.keysLeft.push(65);
         this._camera.keysRight.push(68);
 
+
         //camera properties
         this._camera.speed = 1.5;
         this._camera.fov = 0.8;
@@ -107,7 +109,6 @@ class App {
         this._camera.applyGravity = true;
 
         // generate current players mesh
-        console.log(this._camera);
         new CurrentPlayer(this._scene, this._camera);
 
 
@@ -119,14 +120,14 @@ class App {
 
 
         plane.rotate(Axis.X, Math.PI /2, Space.WORLD);
-        plane.position.y = -1;
+        plane.position.y = -0.75;
         let groundPhysicsImposter = new PhysicsImpostor(
             plane,
             PhysicsImpostor.BoxImpostor,
             {
                 mass: 0,
                 friction: 0.1, 
-                restitution: .7
+                restitution: 1.0
             },
             this._scene 
           );
@@ -136,7 +137,7 @@ class App {
         //this._physicsEngine();
 
 
-        let light = new HemisphericLight("gamelight", new Vector3(1,1,0), this._scene);
+        this._light = new HemisphericLight("gamelight", new Vector3(1,1,0), this._scene);
     }
 
     public _createPointerLock(): void {
@@ -162,4 +163,3 @@ class App {
 
 }
 new App();
-

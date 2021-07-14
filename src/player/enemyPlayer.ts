@@ -23,9 +23,9 @@ export class EnemyPlayer{
             this._playerMesh,
             PhysicsImpostor.BoxImpostor,
             {
-                mass: 1,
+                mass: 1000000,
                 friction: 0.1,
-                restitution: 0
+                restitution: 1 
             },
             this._scene
         );
